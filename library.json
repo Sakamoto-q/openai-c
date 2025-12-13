@@ -1,19 +1,7 @@
 {
     "name": "openai-c",
-    "version": "0.0.3",
-    "description": "OpenAI API C client library with ESP32 support",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Sakamoto-q/openai-c.git"
-    },
-    "authors": [
-        {
-        "name": "Sakamoto-q",
-        "email": "sakamoto.cute@gmail.com"
-        }
-    ],
-    "license": "MIT",
-    "homepage": "https://github.com/Sakamoto-q/openai-c",
+    "version": "0.0.4",
+    "description": "A lightweight OpenAI API C client library with support for ESP32 platforms.",
     "frameworks": [
         "arduino"
     ],
