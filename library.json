@@ -1,6 +1,6 @@
 {
     "name": "openai-c",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "OpenAI API C client library with ESP32 support",
     "repository": {
         "type": "git",
