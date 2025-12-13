@@ -22,10 +22,16 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 find_package(CURL REQUIRED)
 find_package(cJSON CONFIG REQUIRED)
 
-file(GLOB_RECURSE SOURCES "src/*.c")
-option(BUILD_SHARED_LIBS "Build shared library instead of static" OFF)
+file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.c")
+list(FILTER SOURCES EXCLUDE REGEX "src/esp32/.*")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+if(SOURCES)
+    message(STATUS "Source files found: ${SOURCES}")
+else()
+    message(FATAL_ERROR "NO SOURCE FILES FOUND! Check src/ directory")
+endif()
+
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} 
     PUBLIC 
@@ -44,6 +50,8 @@ if(WIN32)
 endif()
 
 file(GLOB HEADERS "${CMAKE_SOURCE_DIR}/include/*.h")
+list(FILTER HEADERS EXCLUDE REGEX "include/esp32/.*")
+
 install(
     FILES ${HEADERS}
     DESTINATION include/${PROJECT_NAME}
