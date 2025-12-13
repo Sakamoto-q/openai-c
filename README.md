@@ -1,31 +1,29 @@
 # OpenAI-C
 
-A lightweight OpenAI API C client library with support for both desktop and ESP32 platforms.
+A lightweight OpenAI API C client library with support for both Windows and Linux and ESP32 platforms.
 
-## Requirements
+---
 
-### Desktop (Windows/Linux)
-- `cmake`
-- `vcpkg`
-- `cJSON`
-- `libcurl (curl)`
+> [!CAUTION]
+> DO NOT RUNNING YOUR ARDUINO
+>
+> ----- [ `at compile` ] ------
+>
+> RAM: `45 KiB (46940 bytes)`
+>
+> Flash: `921 KiB (943349 bytes)`
 
-### ESP32
-- `PlatformIO`
-- `ESP32 board`
-- `USB driver (CP2102 or CH340)`
+> [!IMPORTANT]
+> The `ESP32` is fundamentally built with `PlatformIO`.
+>
+> Need to : `PlatformIO`, `ESP32 Board`
 
-## Installation
+> [!IMPORTANT]
+> The `Windows/Linux` builds are fundamentally done with `vcpkg`.
+>
+> Need to: `cmake`, `vcpkg`, `cJSON`, `libcurl (curl)`
 
-### Desktop Build
-
-#### 1. Run script from installed file
-
-```sh
-make install x64-windows
-make install x64-linux
-...
-```
+---
 
 ### ESP32 Build
 
@@ -57,9 +55,126 @@ lib_deps =
     ArduinoJson
 ```
 
-## Usage Examples
+---
 
-### Desktop
+### Windows/Linux Build
+
+#### 1. Run script from installed file
+
+```sh
+make install x64-windows
+make install x64-linux
+...
+```
+
+---
+
+### ESP32 Example
+
+```cpp
+#include <WiFi.h>
+#include <Arduino.h>
+#include <openai-c.h>
+
+const char* ssid     = "YOUR WIFI NAME";
+const char* password = "YOUR WIFI PASSWORD";
+
+const char* openai_api_key = "your-api-key";
+
+void init() {
+    Serial.begin(115200);
+    pinMode(2, OUTPUT);
+}
+
+void wifi_connect() {
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, password);
+
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+
+    Serial.println("\nWiFi connected!");
+}
+
+int openai_init(OpenAIClient *client) {
+    int error;
+
+    error = new_openai_client(client, openai_api_key);
+    if (error != 0) {
+        return error;
+    }
+
+    error = openai_client_init_authorization(client);
+    if (error != 0) {
+        return error;
+    }
+
+    return 0;
+}
+
+int print_openai_chat_request(const OpenAIClient *client, const OpenAIRequest *request) {
+    int error;
+
+    analogWrite(2, 255);
+
+    char *response = NULL;
+    error = openai_client_chat_request(client, request, &response);
+    
+    analogWrite(2, 0);
+    if (error != 0) {
+        return error;
+    }
+
+    if (response == NULL) {
+        return OPENAI_RESPONSE_TO_CONTENT_NULL_OUTPUT;
+    }
+
+    Serial.println(response);
+
+    free(response);
+
+    return 0;
+}
+
+void setup() {
+    init();
+    delay(2000);
+    
+    wifi_connect();
+    
+    int error;
+    OpenAIClient client;
+
+    error = openai_init(&client);
+    if (error != 0) {
+        Serial.printf("error: %d\n", error);
+        return;
+    }
+    
+    OpenAIRequest request = {
+        .model = "gpt-4o-mini",
+        .input = "Hello, who are you?",
+    };
+
+    error = print_openai_chat_request(&client, &request);
+    if (error != 0) {
+        Serial.printf("error: %d\n", error);
+        return;
+    }
+    
+    openai_client_free(&client);
+}
+
+void loop() {
+    delay(1000);
+}
+```
+
+---
+
+### Windows/Linux Example
 
 ```c
 #include <stdio.h>
@@ -70,7 +185,7 @@ int main() {
     int error;
     struct OpenAIClient client;
     
-    error = new_openai_client(&client, "sk-xxxx");
+    error = new_openai_client(&client, "your-api-key");
     if (error != 0) {
         printf("Error: %s\n", openai_error_to_string(error));
         return error;
@@ -108,71 +223,5 @@ int main() {
     }
     
     return 0;
-}
-```
-
-### ESP32
-
-```cpp
-#include <Arduino.h>
-#include <WiFi.h>
-
-extern "C" {
-    #include <openai-c.h>
-}
-
-const char* ssid = "YOUR_SSID";
-const char* password = "YOUR_PASSWORD";
-
-void setup() {
-    Serial.begin(115200);
-    delay(2000);
-    
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password);
-    
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("\nWiFi connected!");
-    
-    int error;
-    OpenAIClient client;
-
-    error = new_openai_client(&client, "sk-your-api-key");
-    if (error != 0) {
-        Serial.printf("error: %d\n", error);
-        return;
-    }
-
-    error = openai_client_init_authorization(&client);
-    if (error != 0) {
-        Serial.printf("error: %d\n", error);
-        return;
-    }
-    
-    OpenAIRequest request = {
-        .model = "gpt-4o-mini",
-        .input = "Hello, who are you?",
-    };
-    
-    char *response = NULL;
-    error = openai_client_chat_request(&client, &request, &response);
-    if (error != 0) {
-        Serial.printf("error: %d\n", error);
-        return;
-    }
-    
-    if (response != NULL) {
-        Serial.println(response);
-        free(response);
-    }
-    
-    openai_client_free(&client);
-}
-
-void loop() {
-    delay(1000);
 }
 ```
