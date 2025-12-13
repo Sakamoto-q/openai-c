@@ -1,9 +1,12 @@
-init:
-	@if not exist "build" mkdir build
-	cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE="${vcpkgRoot}\scripts\buildsystems\vcpkg.cmake" -DCMAKE_PREFIX_PATH="${vcpkgRoot}\packages" -G "Visual Studio 17 2022" && chcp 65001
+.PHONY: remove install
 
-compile:
-	cd build && cmake --build . --config Release
+remove:
+	$(eval os := $(word 2,$(MAKECMDGOALS)))
+	vcpkg remove openai-c:$(os) --overlay-ports=./ports
 
 install:
-	cd build && cmake --install . --prefix "${vcpkgRoot}\packages\openai-c"
+	$(eval os := $(word 2,$(MAKECMDGOALS)))
+	vcpkg install openai-c:$(os) --overlay-ports=./ports
+
+%:
+	@:

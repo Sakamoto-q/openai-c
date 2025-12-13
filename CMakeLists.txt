@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(openai-c C)
+
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
@@ -32,7 +33,11 @@ target_include_directories(${PROJECT_NAME}
         $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE CURL::libcurl cjson)
+target_link_libraries(${PROJECT_NAME} 
+    PUBLIC
+        CURL::libcurl 
+        cjson
+)
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32 crypt32 wldap32)
@@ -45,7 +50,7 @@ install(
 )
 
 install(TARGETS ${PROJECT_NAME}
-    EXPORT openai-c-exports 
+    EXPORT openai-c-targets
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
@@ -56,24 +61,24 @@ include(CMakePackageConfigHelpers)
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/openai-cConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/openai-cConfig.cmake"
-    INSTALL_DESTINATION lib/cmake/openai-c
+    INSTALL_DESTINATION share/openai-c/cmake
 )
 
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/openai-cConfigVersion.cmake.in"
+write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/openai-cConfigVersion.cmake"
-    @ONLY
+    VERSION 1.0.0
+    COMPATIBILITY AnyNewerVersion
 )
 
-install(EXPORT openai-c-exports
+install(EXPORT openai-c-targets
     FILE openai-cTargets.cmake
     NAMESPACE openai-c::
-    DESTINATION lib/cmake/openai-c
+    DESTINATION share/openai-c/cmake
 )
 
 install(
     FILES 
         "${CMAKE_CURRENT_BINARY_DIR}/openai-cConfig.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/openai-cConfigVersion.cmake"
-    DESTINATION lib/cmake/openai-c
+    DESTINATION share/openai-c/cmake
 )

@@ -1,8 +1,17 @@
 > [!WARNING]
 > This project requires the following libraries to build:
 > - `cmake`
+> - `vcpkg`
 > - `cJSON`
 > - `libcurl (curl)`
+
+install
+
+```sh
+make install x64-windows
+make install x64-linux
+...
+```
 
 example
 

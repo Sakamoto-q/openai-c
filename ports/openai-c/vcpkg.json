@@ -1,0 +1,9 @@
+{
+    "name": "openai-c",
+    "version-string": "0.0.1",
+    "description": "OpenAI API C library",
+    "dependencies": [
+        "curl",
+        "cjson"
+    ]
+}
