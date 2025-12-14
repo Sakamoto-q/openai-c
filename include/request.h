@@ -22,6 +22,6 @@ int openai_request_to_json(const OpenAIRequest *request, char **json_output);
 
 int openai_response_to_content(const char *response, char **res_json);
 
-int openai_client_chat_request(const OpenAIClient *client, const OpenAIRequest *request, char **response_json);
+int openai_client_chat_request(const OpenAIClient *client, const OpenAIRequest *request, char **response);
 
 #endif // OPENAI_REQUEST_H

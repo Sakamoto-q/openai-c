@@ -1,10 +1,9 @@
 #include <stdio.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "client.h"
-#include "error.h"
+#include "esp32-client.h"
+#include "esp32-error.h"
 
 int new_openai_client(OpenAIClient *client, const char *token) {
     if (client == NULL) {

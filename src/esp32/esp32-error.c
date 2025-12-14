@@ -1,4 +1,4 @@
-#include "error.h"
+#include "esp32-error.h"
 
 const char* openai_error_to_string(OpenAIError error) {
     switch (error) {

@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-#include "client.h"
-#include "error.h"
-#include "request.h"
+#include "esp32-client.h"
+#include "esp32-error.h"
+#include "esp32-request.h"
 
 #ifdef __cplusplus
 }

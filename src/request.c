@@ -41,30 +41,17 @@ int openai_request_to_json(const OpenAIRequest *request, char **req_json) {
         return OPENAI_REQUEST_TO_JSON_NULL_MODEL_OR_INPUT;
     }
 
-    cJSON *root = cJSON_CreateObject();
-    if (root == NULL) {
-        return OPENAI_REQUEST_TO_JSON_CREATE_OBJECT;
-    }
+    int size = snprintf(NULL, 0, "{\"model\":\"%s\", \"input\":\"%s\"}", request->model, request->input) + 1;
 
-    if (!cJSON_AddStringToObject(root, "model", request->model)) {
-        cJSON_Delete(root);
-        return OPENAI_REQUEST_TO_JSON_ADD_MODEL;
-    }
-
-    if (!cJSON_AddStringToObject(root, "input", request->input)) {
-        cJSON_Delete(root);
-        return OPENAI_REQUEST_TO_JSON_ADD_INPUT;
-    }
-
-    char *json_string = cJSON_PrintUnformatted(root);
-    cJSON_Delete(root);
-
+    char *json_string = (char *) malloc(size);
     if (json_string == NULL) {
         return OPENAI_REQUEST_TO_JSON_PRINT;
     }
 
+    snprintf(json_string, size, "{\"model\":\"%s\", \"input\":\"%s\"}", request->model, request->input);
+
     *req_json = json_string;
-    return OK;
+    return OPENAI_OK;
 }
 
 int openai_response_to_content(const char *response, char **res_json) {
@@ -131,7 +118,7 @@ int openai_response_to_content(const char *response, char **res_json) {
     return OK;
 }
 
-int openai_client_chat_request(const struct OpenAIClient *client, const OpenAIRequest *request, char **response_json) {
+int openai_client_chat_request(const struct OpenAIClient *client, const OpenAIRequest *request, char **response) {
     CURL *curl;
     CURLcode res;
     MemoryStruct chunk;
@@ -141,11 +128,11 @@ int openai_client_chat_request(const struct OpenAIClient *client, const OpenAIRe
     char *response_content = NULL;
     int error;
 
-    if (client == NULL || client->authorization == NULL || request == NULL || response_json == NULL) {
+    if (client == NULL || client->authorization == NULL || request == NULL || response == NULL) {
         return OPENAI_CLIENT_CHAT_REQUEST_NULL_PARAMS;
     }
 
-    *response_json = NULL;
+    *response = NULL;
     chunk.memory = malloc(1);
     chunk.size = 0;
     if (chunk.memory == NULL) {
@@ -207,7 +194,7 @@ int openai_client_chat_request(const struct OpenAIClient *client, const OpenAIRe
         return error;
     }
 
-    *response_json = response_content;
+    *response = response_content;
 
     free(req_json);
     free(chunk.memory);

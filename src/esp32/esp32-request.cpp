@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <cJSON.h>
+
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
 
-#include <cJSON.h>
-
-#include "request.h"
-#include "client.h"
-#include "error.h"
+#include "esp32-request.h"
+#include "esp32-client.h"
+#include "esp32-error.h"
 
 int openai_request_to_json(const OpenAIRequest *request, char **req_json) {
     if (req_json == NULL) {
@@ -26,27 +26,14 @@ int openai_request_to_json(const OpenAIRequest *request, char **req_json) {
         return OPENAI_REQUEST_TO_JSON_NULL_MODEL_OR_INPUT;
     }
 
-    cJSON *root = cJSON_CreateObject();
-    if (root == NULL) {
-        return OPENAI_REQUEST_TO_JSON_CREATE_OBJECT;
-    }
+    int size = snprintf(NULL, 0, "{\"model\":\"%s\", \"input\":\"%s\"}", request->model, request->input) + 1;
 
-    if (!cJSON_AddStringToObject(root, "model", request->model)) {
-        cJSON_Delete(root);
-        return OPENAI_REQUEST_TO_JSON_ADD_MODEL;
-    }
-
-    if (!cJSON_AddStringToObject(root, "input", request->input)) {
-        cJSON_Delete(root);
-        return OPENAI_REQUEST_TO_JSON_ADD_INPUT;
-    }
-
-    char *json_string = cJSON_PrintUnformatted(root);
-    cJSON_Delete(root);
-
+    char *json_string = (char *) malloc(size);
     if (json_string == NULL) {
         return OPENAI_REQUEST_TO_JSON_PRINT;
     }
+
+    snprintf(json_string, size, "{\"model\":\"%s\", \"input\":\"%s\"}", request->model, request->input);
 
     *req_json = json_string;
     return OPENAI_OK;
@@ -116,15 +103,15 @@ int openai_response_to_content(const char *response, char **res_json) {
     return OPENAI_OK;
 }
 
-int openai_client_chat_request(const OpenAIClient *client, const OpenAIRequest *request, char **response_json) {
+int openai_client_chat_request(const OpenAIClient *client, const OpenAIRequest *request, char **response) {
     if (client == NULL ||
         client->authorization == NULL ||
         request == NULL ||
-        response_json == NULL) {
+        response == NULL) {
         return OPENAI_CLIENT_CHAT_REQUEST_NULL_PARAMS;
     }
 
-    *response_json = NULL;
+    *response = NULL;
 
     char *req_json = NULL;
     int err = openai_request_to_json(request, &req_json);
@@ -142,7 +129,7 @@ int openai_client_chat_request(const OpenAIClient *client, const OpenAIRequest *
     }
 
     http.addHeader("Content-Type", "application/json");
-    http.addHeader("Authorization", client->authorization + 15); 
+    http.addHeader("Authorization", client->authorization + 15);
 
     int httpCode = http.POST((uint8_t *)req_json, strlen(req_json));
     free(req_json);
@@ -166,6 +153,6 @@ int openai_client_chat_request(const OpenAIClient *client, const OpenAIRequest *
         return err;
     }
 
-    *response_json = response_content;
+    *response = response_content;
     return OPENAI_OK;
 }

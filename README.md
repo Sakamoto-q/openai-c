@@ -5,13 +5,12 @@ A lightweight OpenAI API C client library with support for both Windows and Linu
 ---
 
 > [!CAUTION]
-> DO NOT RUNNING YOUR ARDUINO
+> This project was fundamentally developed targeting the ESP32 platform.
 >
-> ----- [ `at compile` ] ------
+> **Minimum Hardware Specifications:**
 >
-> RAM: `45 KiB (46940 bytes)`
->
-> Flash: `921 KiB (943349 bytes)`
+> * **RAM :** `45 KiB (46,940 bytes)`
+> * **Flash :** `909 KiB (930,893 bytes)`
 
 > [!IMPORTANT]
 > The `ESP32` is fundamentally built with `PlatformIO`.
@@ -46,10 +45,14 @@ Add the following configuration to `platformio.ini`:
 board = esp32dev
 framework = arduino
 platform = espressif32
+
 upload_port = COM3
 monitor_port = COM3
 monitor_speed = 115200
-lib_extra_dirs = lib
+
+lib_extra_dirs =
+    lib
+
 lib_deps =
     openai-c
     ArduinoJson
