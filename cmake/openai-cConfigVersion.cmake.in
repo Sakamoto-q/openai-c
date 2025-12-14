@@ -1,4 +1,4 @@
-set(openai-c_VERSION 0.0.5)
+set(openai-c_VERSION 0.0.6)
 
 if(NOT openai-c_FIND_VERSION_EXACT)
     if(openai-c_FIND_VERSION_LESS_EQUAL "${openai-c_VERSION}")
