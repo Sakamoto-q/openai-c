@@ -26,48 +26,30 @@ A lightweight OpenAI API C client library with support for both Windows and Linu
 
 ### ESP32 Build
 
-#### 1. Copy Library to Project
+The library for the ESP32 platform is primarily distributed via the **[PlatformIO](https://registry.platformio.org/libraries/sakamoto-q/openai-c)**.
 
-Copy the `openai-c` folder to your PlatformIO project's `lib` directory:
+#### 1. Configure platformio.ini
 
-```
-your-project/
-└── lib/
-    └── openai-c/  ← Copy entire folder here
-```
-
-#### 2. Configure platformio.ini
-
-Add the following configuration to `platformio.ini`:
+Add the `sakamoto-q/openai-c` library as a dependency to your project's `platformio.ini` file.
 
 ```ini
-[env:esp32]
-board = esp32dev
-framework = arduino
-platform = espressif32
-
-upload_port = COM3
-monitor_port = COM3
-monitor_speed = 115200
-
-lib_extra_dirs =
-    lib
-
+# ... other configurations ...
 lib_deps =
-    openai-c
-    ArduinoJson
+    sakamoto-q/openai-c # <- Adden
 ```
 
 ---
 
 ### Windows/Linux Build
 
+The Windows and Linux builds are primarily managed and automatically installed via **[vcpkg](https://github.com/microsoft/vcpkg)**.
+
 #### 1. Run script from installed file
 
 ```sh
 make install x64-windows
 make install x64-linux
-...
+# ... other platforms ...
 ```
 
 ---
