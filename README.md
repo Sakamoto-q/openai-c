@@ -59,12 +59,12 @@ make install x64-linux
 ```cpp
 #include <WiFi.h>
 #include <Arduino.h>
-#include <openai-c.h>
+#include <esp32-openai-c.h>
 
-const char* ssid     = "YOUR WIFI NAME";
-const char* password = "YOUR WIFI PASSWORD";
+const char* ssid     = "YOUR-WIFI-NAME";
+const char* password = "YOUR-WIFI-PASSWORD";
 
-const char* openai_api_key = "your-api-key";
+const char* openai_api_key = "YOUR-OPENAI-API-KEY";
 
 void init() {
     Serial.begin(115200);
@@ -170,7 +170,7 @@ int main() {
     int error;
     struct OpenAIClient client;
     
-    error = new_openai_client(&client, "your-api-key");
+    error = new_openai_client(&client, "YOUR-OPENAI-API-KEY");
     if (error != 0) {
         printf("Error: %s\n", openai_error_to_string(error));
         return error;
